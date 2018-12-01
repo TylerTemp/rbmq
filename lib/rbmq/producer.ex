@@ -57,13 +57,7 @@ defmodule RBMQ.Producer do
 
       @doc false
       def handle_call({:publish, data}, _from, chan) do
-        case Jason.encode(data) do
-          {:ok, encoded_data} ->
-            safe_publish(chan, encoded_data)
-
-          {:error, _} = err ->
-            {:reply, err, chan}
-        end
+        safe_publish(chan, encoded_data)
       end
 
       defp safe_publish(chan, data) do

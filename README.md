@@ -1,7 +1,13 @@
 # RBMQ
 
+**About this fork**
+
+remove jason decode when publish
+
+**About**
+
 Simple and easy creation of producers and consumers for RabbitMQ.
-Written over <a href="https://github.com/pma/amqp" target="_blank">AMQP</a>
+Written over [AMQP](https://github.com/pma/amqp)
 
 ## Installation
 

@@ -36,7 +36,6 @@ defmodule Rbmq.Mixfile do
     [
       {:amqp, "~> 1.0"},
       {:rabbit_common, "~> 3.7", override: true},
-      {:jason, "~> 1.0"},
       {:confex, "~> 1.0"},
       {:benchfella, "~> 0.3", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: :dev},
