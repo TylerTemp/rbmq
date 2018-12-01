@@ -57,7 +57,7 @@ defmodule RBMQ.Producer do
 
       @doc false
       def handle_call({:publish, data}, _from, chan) do
-        safe_publish(chan, encoded_data)
+        safe_publish(chan, data)
       end
 
       defp safe_publish(chan, data) do
