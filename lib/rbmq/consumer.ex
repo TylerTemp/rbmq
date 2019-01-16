@@ -55,10 +55,10 @@ defmodule RBMQ.Consumer do
 
       # Handle new message delivery
       def handle_info(
-            {:basic_deliver, payload, %{delivery_tag: tag, redelivered: redelivered}},
+            {:basic_deliver, payload, basic_properties},
             state
           ) do
-        consume(payload, tag: tag, redelivered?: redelivered)
+        consume(payload, basic_properties)
         {:noreply, state}
       end
 
@@ -80,7 +80,7 @@ defmodule RBMQ.Consumer do
         end)
       end
 
-      def consume(_payload, tag: tag, redelivered?: _redelivered, channel: chan) do
+      def consume(_payload, %{tag: tag, redelivered?: _redelivered, channel: chan}) do
         # Mark this message as unprocessed
         nack(tag)
         # Stop consumer from receiving more messages

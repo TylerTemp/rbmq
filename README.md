@@ -98,10 +98,12 @@ Other connections settings can be found in [AMQP client docs](https://hexdocs.pm
       # Queue params
       queue: [
         name: "consomer_queue",
-        durable: false
       ],
       qos: [
         prefetch_count: 10
+      ],
+      options: [
+        durable: false
       ]
 
     def consume(_payload, [tag: tag, redelivered?: _redelivered]) do
