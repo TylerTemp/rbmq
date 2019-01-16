@@ -11,13 +11,21 @@ defmodule RBMQ.Consumer do
       use RBMQ.GenQueue, opts
 
       def init_worker(chan, opts) do
-        link_consumer(chan, opts[:queue][:name])
+        link_consumer(chan, opts[:queue][:name], Keyword.get(opts, :options, []))
         chan
       end
 
-      defp link_consumer(chan, queue_name) do
+      defp link_consumer(chan, queue_name, options) do
+        normalized_options =
+          if Keyword.has_key?(options, :durable) do
+            {persistent, clean_options} = Keyword.pop(options, :durable)
+            Keyword.put(clean_options, :persistent, persistent)
+          else
+            options
+          end
+
         safe_run(fn chan ->
-          {:ok, _consumer_tag} = AMQP.Basic.consume(chan, queue_name)
+          {:ok, _consumer_tag} = AMQP.Basic.consume(chan, queue_name, nil, normalized_options)
           Process.monitor(chan.pid)
         end)
       end
@@ -25,7 +33,8 @@ defmodule RBMQ.Consumer do
       @doc false
       def handle_info({:DOWN, monitor_ref, :process, pid, reason}, state) do
         Process.demonitor(monitor_ref)
-        state = link_consumer(nil, chan_config()[:queue][:name])
+        config = chan_config()
+        state = link_consumer(nil, config[:queue][:name], Keyword.get(config, :options, []))
         {:noreply, state}
       end
 
