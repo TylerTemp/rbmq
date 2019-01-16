@@ -51,33 +51,38 @@ defmodule RBMQ.Producer do
       @doc """
       Publish new message to a linked channel.
       """
-      def publish(data) do
-        GenServer.call(__MODULE__, {:publish, data}, :infinity)
+      def publish(data, extra_options \\ []) do
+        GenServer.call(__MODULE__, {:publish, {data, extra_options}}, :infinity)
       end
 
       @doc false
-      def handle_call({:publish, data}, _from, chan) do
-        safe_publish(chan, data)
+      def handle_call({:publish, {data, extra_options}}, _from, chan) do
+        safe_publish(chan, data, extra_options)
       end
 
-      defp safe_publish(chan, data) do
+      defp safe_publish(chan, data, extra_options \\ []) do
         safe_run(fn chan ->
-          cast(chan, data)
+          cast(chan, data, extra_options)
         end)
       end
 
-      defp cast(chan, data) do
+      defp cast(chan, data, extra_options \\ []) do
         conf = chan_config()
 
         is_persistent = Keyword.get(conf[:queue], :durable, false)
+
+        options =
+          [
+            mandatory: true,
+            persistent: is_persistent
+          ] ++ extra_options
 
         case Basic.publish(
                chan,
                conf[:exchange][:name],
                conf[:queue][:routing_key],
                data,
-               mandatory: true,
-               persistent: is_persistent
+               options
              ) do
           :ok ->
             {:reply, :ok, chan}

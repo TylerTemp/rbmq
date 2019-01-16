@@ -3,11 +3,11 @@
     %{
       name: "default",
       files: %{
-        included: ["lib/"],
+        included: ["lib/"]
       },
       checks: [
         {Credo.Check.Readability.MaxLineLength, priority: :low, max_length: 120},
-        {Credo.Check.Warning.UnusedEnumOperation, false},
+        {Credo.Check.Warning.UnusedEnumOperation, false}
       ]
     }
   ]
