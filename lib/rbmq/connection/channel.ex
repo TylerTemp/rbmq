@@ -65,10 +65,11 @@ defmodule RBMQ.Connection.Channel do
       if Keyword.has_key?(options, :durable) do
         {persistent, clean_options} = Keyword.pop(options, :durable)
         Keyword.put(clean_options, :persistent, persistent)
+        # Keyword.put(options, :persistent, options[:durable])
       else
         options
       end
-
+    # IO.puts("configure_queue.normalized_options=#{inspect normalized_options}")
     Helper.declare_queue(chan, queue_opts[:name], queue_opts[:error_name], normalized_options)
     chan
   end

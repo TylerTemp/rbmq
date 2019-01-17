@@ -202,7 +202,14 @@ defmodule RBMQ.Connection.Helper do
       "Declaring new queue '#{queue}' without dead letter queue. Options: #{inspect(opts)}"
     end)
 
-    Queue.declare(chan, env(queue), env(opts))
+    new_opt =
+      if (Keyword.get(opts, :persistent, false)) do
+         Keyword.put(env(opts), :durable, true)
+      else
+        env(opts)
+      end
+    # IO.puts("new_opt=#{inspect new_opt}")
+    Queue.declare(chan, env(queue), new_opt)
 
     chan
   end
