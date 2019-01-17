@@ -43,7 +43,7 @@ defmodule RBMQ.Connection.Channel do
   defp configure(chan, chan_opts) do
     chan
     |> configure_qos(chan_opts[:qos])
-    |> configure_queue(chan_opts[:queue])
+    |> configure_queue(chan_opts[:queue], Keyword.get(chan_opts, :options, []))
     |> configure_exchange(chan_opts[:queue], chan_opts[:exchange])
   end
 
@@ -56,12 +56,20 @@ defmodule RBMQ.Connection.Channel do
     chan
   end
 
-  defp configure_queue(chan, nil) do
+  defp configure_queue(chan, nil, _options) do
     chan
   end
 
-  defp configure_queue(chan, queue_opts) do
-    Helper.declare_queue(chan, queue_opts[:name], queue_opts[:error_name], queue_opts)
+  defp configure_queue(chan, queue_opts, options) do
+    normalized_options =
+      if Keyword.has_key?(options, :durable) do
+        {persistent, clean_options} = Keyword.pop(options, :durable)
+        Keyword.put(clean_options, :persistent, persistent)
+      else
+        options
+      end
+
+    Helper.declare_queue(chan, queue_opts[:name], queue_opts[:error_name], normalized_options)
     chan
   end
 
